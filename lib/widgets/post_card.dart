@@ -115,7 +115,22 @@ class _ActionsRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
-         const IconButton(
+          IconButton(
+            onPressed: onToggleLike,
+            tooltip: isLiked ? 'Retirer le like' : "Ajouter un like",
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 150),
+              transitionBuilder: (child, animation) =>
+                  ScaleTransition(scale: animation, child: child),
+              child: Icon(
+                isLiked ? Icons.favorite : Icons.favorite_border,
+                key: ValueKey<bool>(isLiked),
+                color: isLiked ? AppColors.likeRed : AppColors.primaryText,
+                size: 26,
+              ),
+            ),
+          ),
+          const IconButton(
             onPressed: null,
             icon: Icon(Icons.mode_comment_outlined, size: 24),
             color: AppColors.primaryText,
