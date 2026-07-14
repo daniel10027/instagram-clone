@@ -1,30 +1,29 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
-import 'package:instagram_clone/main.dart';
+import 'package:instagram_clone/providers/auth_provider.dart';
+import 'package:instagram_clone/screens/login_screen.dart';
 
+/// Test de fumee de l'application : verifie que l'ecran de connexion
+/// se construit sans erreur et affiche ses elements principaux.
+///
+/// Ce fichier remplace volontairement le test genere par defaut par
+/// `flutter create` (qui reference une classe `MyApp` inexistante dans
+/// ce projet). Sa presence ici empeche `flutter create .` d'injecter a
+/// nouveau ce test par defaut lors de la regeneration des dossiers de
+/// plateforme en CI (voir README, section "Choix techniques").
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets("L'ecran de connexion s'affiche avec ses elements principaux", (tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider<AuthProvider>(
+        create: (_) => AuthProvider(),
+        child: const MaterialApp(home: LoginScreen()),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Instagram'), findsOneWidget);
+    expect(find.text('Log In'), findsOneWidget);
+    expect(find.byType(TextField), findsNWidgets(2));
   });
 }

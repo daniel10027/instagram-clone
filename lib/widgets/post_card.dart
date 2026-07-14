@@ -130,22 +130,22 @@ class _ActionsRow extends StatelessWidget {
               ),
             ),
           ),
-          IconButton(
+          const IconButton(
             onPressed: null,
-            icon: const Icon(Icons.mode_comment_outlined, size: 24),
+            icon: Icon(Icons.mode_comment_outlined, size: 24),
             color: AppColors.primaryText,
             disabledColor: AppColors.primaryText,
           ),
-          IconButton(
+          const IconButton(
             onPressed: null,
-            icon: const Icon(Icons.send_outlined, size: 24),
+            icon: Icon(Icons.send_outlined, size: 24),
             color: AppColors.primaryText,
             disabledColor: AppColors.primaryText,
           ),
           const Spacer(),
-          IconButton(
+          const IconButton(
             onPressed: null,
-            icon: const Icon(Icons.bookmark_border, size: 24),
+            icon: Icon(Icons.bookmark_border, size: 24),
             color: AppColors.primaryText,
             disabledColor: AppColors.primaryText,
           ),
