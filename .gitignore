@@ -1,0 +1,33 @@
+# Secrets
+dart_define.json
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.g.dart
+*.freezed.dart
+
+# Dossiers de plateformes natives : generes automatiquement via
+# `flutter create .` (voir README, section Installation). Ne pas versionner
+# pour eviter tout conflit de versions Gradle/CocoaPods avec la machine locale.
+/android/
+/ios/
+/macos/
+/windows/
+/linux/
+/web/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Divers
+.DS_Store
+*.log
+coverage/

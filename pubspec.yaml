@@ -1,0 +1,48 @@
+name: instagram_clone
+description: "Clone technique de l'interface Instagram - Evaluation FFK (authentification, feed Unsplash, likes persistants)"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Gestion d'etat
+  provider: ^6.1.2
+
+  # Appels reseau vers l'API Unsplash
+  http: ^1.2.2
+
+  # Chargement et cache des images distantes, avec placeholder integre
+  cached_network_image: ^3.4.1
+
+  # Base de donnees cle/valeur embarquee cote client, choisie comme
+  # equivalent a "Level" pour la persistance des likes (voir README)
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/icon.png"
+  remove_alpha_ios: true

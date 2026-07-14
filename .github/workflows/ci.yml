@@ -1,0 +1,138 @@
+name: CI
+
+# Ce workflow s'execute :
+# - sur chaque push vers les branches main et develop
+# - sur chaque pull request ciblant main ou develop
+#
+# Il regenere les dossiers de plateforme natifs (non verses dans Git,
+# voir .gitignore), verifie le code (analyse statique), execute
+# l'integralite de la suite de tests (unitaires + widgets), puis
+# construit un APK Android release, publie comme artefact telechargeable.
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.24.5"
+
+jobs:
+  quality-checks:
+    name: Analyse statique et tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le code source
+        uses: actions/checkout@v4
+
+      - name: Installer Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+          cache: true
+
+      - name: Generer les dossiers de plateforme (android) manquants
+        run: flutter create . --platforms=android --org com.ffk.instagramclone --project-name instagram_clone
+
+      - name: Ajouter la permission INTERNET (necessaire aux appels Unsplash en release)
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
+            sed -i 's#<manifest xmlns:android="http://schemas.android.com/apk/res/android">#<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.INTERNET" />#' "$MANIFEST"
+          fi
+          cat "$MANIFEST"
+
+      - name: Recuperer les dependances
+        run: flutter pub get
+
+      - name: Verifier le formatage du code (informatif, non bloquant)
+        run: dart format --output=none . || echo "Des fichiers ne sont pas formates avec 'dart format .' -- a corriger dans un prochain commit."
+
+      - name: Analyse statique (flutter analyze)
+        run: flutter analyze
+
+      - name: Executer la suite de tests avec couverture
+        run: flutter test --coverage
+
+      - name: Publier le rapport de couverture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/lcov.info
+          retention-days: 7
+
+  build-android:
+    name: Build APK Android (release)
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    steps:
+      - name: Recuperer le code source
+        uses: actions/checkout@v4
+
+      - name: Installer Java (requis par Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Installer Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+          cache: true
+
+      - name: Generer les dossiers de plateforme (android) manquants
+        run: flutter create . --platforms=android --org com.ffk.instagramclone --project-name instagram_clone
+
+      - name: Ajouter la permission INTERNET (necessaire aux appels Unsplash en release)
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
+            sed -i 's#<manifest xmlns:android="http://schemas.android.com/apk/res/android">#<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.INTERNET" />#' "$MANIFEST"
+          fi
+
+      - name: Recuperer les dependances
+        run: flutter pub get
+
+      - name: Generer l'icone de l'application
+        run: dart run flutter_launcher_icons
+
+      - name: Construire l'APK release
+        run: |
+          flutter build apk --release \
+            --dart-define=UNSPLASH_ACCESS_KEY="${{ secrets.UNSPLASH_ACCESS_KEY || 'ci-dummy-key-no-real-quota' }}"
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: instagram-clone-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 14
+
+  status-check:
+    name: Statut global de la CI
+    runs-on: ubuntu-latest
+    needs: [quality-checks, build-android]
+    if: always()
+    steps:
+      - name: Verifier que tous les jobs ont reussi
+        run: |
+          if [ "${{ needs.quality-checks.result }}" != "success" ] || \
+             [ "${{ needs.build-android.result }}" != "success" ]; then
+            echo "Un ou plusieurs jobs ont echoue."
+            exit 1
+          fi
+          echo "Tous les jobs ont reussi. Le code est valide sur cette branche."
