@@ -58,13 +58,18 @@ class _FeedViewState extends State<_FeedView> {
   }
 
   void _logout(BuildContext context) {
+    // On recupere la reference au provider AVANT la navigation, pour ne
+    // jamais reutiliser le BuildContext apres un "gap" asynchrone.
+    final authProvider = context.read<AuthProvider>();
+
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
     );
+
     // On differe la reinitialisation de l'etat d'authentification pour
     // eviter de reconstruire cet ecran pendant sa propre navigation.
-    Future.microtask(() => context.read<AuthProvider>().logout());
+    Future.microtask(() => authProvider.logout());
   }
 
   @override
