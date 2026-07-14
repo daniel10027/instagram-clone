@@ -201,5 +201,3 @@ L'ecran affiche un indicateur de chargement pendant la verification (bouton "Log
 - Les likes sont stockes localement (Hive), propres a l'appareil utilise : ce comportement correspond a la demande explicite d'une "base de donnees cote client".
 - La session n'est pas persistee entre deux lancements de l'application (seuls les likes le sont) : ce n'est pas demande par le cahier des charges, qui precise uniquement que la navigation vers le feed doit suivre immediatement une connexion reussie.
 - Le quota Unsplash en mode Demo (50 requetes/heure) peut etre atteint lors de tests intensifs du scroll infini ; un message d'erreur explicite s'affiche alors, avec un bouton "Reessayer".
-#   i n s t a g r a m - c l o n e  
- 
