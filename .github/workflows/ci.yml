@@ -43,7 +43,7 @@ jobs:
           cache: true
 
       - name: Generer les dossiers de plateforme (android) manquants
-        run: flutter create . --platforms=android --org com.ffk.instagramclone --project-name instagram_clone
+        run: flutter create . --platforms=android,ios --org com.ffk.instagramclone --project-name instagram_clone
 
       - name: Ajouter la permission INTERNET (necessaire aux appels Unsplash en release)
         run: |
@@ -95,7 +95,7 @@ jobs:
           cache: true
 
       - name: Generer les dossiers de plateforme (android) manquants
-        run: flutter create . --platforms=android --org com.ffk.instagramclone --project-name instagram_clone
+        run: flutter create . --platforms=android,ios --org com.ffk.instagramclone --project-name instagram_clone
 
       - name: Ajouter la permission INTERNET (necessaire aux appels Unsplash en release)
         run: |
